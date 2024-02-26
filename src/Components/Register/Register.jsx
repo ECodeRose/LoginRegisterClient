@@ -19,6 +19,8 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  // State to hold the error message
   const navigateTo = useNavigate();
 
   // OnClick lets us get user input
@@ -30,15 +32,25 @@ const Register = () => {
       Email: email,
       UserName: userName,
       Password: password,
-    }).then(() => {
-      // On register redirect user to login page
-      navigateTo("/");
+    })
+      .then(() => {
+        // On register redirect user to login page
+        navigateTo("/");
 
-      // Clear fields
-      setEmail("");
-      setUserName("");
-      setPassword("");
-    });
+        // Clear fields
+        setEmail("");
+        setUserName("");
+        setPassword("");
+      })
+      .catch((error) => {
+        // Handle error response from server
+        if (error.response && error.response.data.error) {
+          setError(error.response.data.error); // Set the error message state
+        } else {
+          console.error("Error:", error);
+          setError("An error occurred. Please try again later.");
+        }
+      });
   };
 
   return (
@@ -67,6 +79,12 @@ const Register = () => {
           </div>
 
           <form action="" className="form grid">
+            {error && (
+              <div className="error-box">
+                <p className="error-message">{error}</p>
+              </div>
+            )}{" "}
+            {/* Display error box if error state is not empty */}
             <div className="inputDiv">
               <label htmlFor="email">Email</label>
               <div className="input flex">
@@ -81,7 +99,6 @@ const Register = () => {
                 />
               </div>
             </div>
-
             <div className="inputDiv">
               <label htmlFor="username">Username</label>
               <div className="input flex">
@@ -96,7 +113,6 @@ const Register = () => {
                 />
               </div>
             </div>
-
             <div className="inputDiv">
               <label htmlFor="password">Password</label>
               <div className="input flex">
@@ -111,12 +127,10 @@ const Register = () => {
                 />
               </div>
             </div>
-
             <button type="submit" className="btn flex" onClick={createUser}>
               <span>Register</span>
               <AiOutlineSwapRight className="icon" />
             </button>
-
             <span className="forgotPassword">
               Forgot your password? <a href="">Click Here</a>
             </span>
