@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Login.css";
 import "../../App.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -19,6 +19,10 @@ const Login = () => {
   const [loginPassword, setLoginPassword] = useState("");
   const navigateTo = useNavigate();
 
+  // Show message to user
+  const [loginStatus, setLoginStatus] = useState("");
+  const [statusHolder, setStatusHolder] = useState("message");
+
   // OnClick lets us get user input
   const loginUser = (e) => {
     // prevent submit
@@ -31,12 +35,28 @@ const Login = () => {
     }).then((response) => {
       console.log();
       // catch an error if the credentials are wrong
-      if (response.data.message) {
+      if (response.data.message || loginUserName == "" || loginPassword == "") {
         navigateTo("/"); // navigate to the same Login page
+        setLoginStatus(`Credentials Don't Exist!`);
       } else {
         navigateTo("/dashboard"); // If the credentials match, navigate to the dashboard
       }
     });
+  };
+
+  useEffect(() => {
+    if (loginStatus !== "") {
+      setStatusHolder("showMessage"); // Show message
+      setTimeout(() => {
+        setStatusHolder("message"); //Hide it after 4s
+      }, 4000);
+    }
+  }, [loginStatus]);
+
+  // Clear the form on submit
+  const onSubmit = () => {
+    setLoginUserName("");
+    setLoginPassword("");
   };
 
   return (
@@ -64,8 +84,8 @@ const Login = () => {
             <h3>Welcome Back!</h3>
           </div>
 
-          <form action="" className="form grid">
-            {/* <span className="message">Login status will go here</span> */}
+          <form className="form grid" onSubmit={onSubmit}>
+            <span className={statusHolder}>{loginStatus}</span>
 
             <div className="inputDiv">
               <label htmlFor="username">Username</label>
