@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Login.css";
 import "../../App.css";
-
-import { Link, NavLink } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Axios from "axios";
 
 // imported icons
 import { FaUserShield } from "react-icons/fa";
@@ -14,6 +14,31 @@ import video from "../../LoginAssets/bookVid.mp4";
 import logo from "../../LoginAssets/logo.png";
 
 const Login = () => {
+  // Usestate Hook to store inputs
+  const [loginUserName, setLoginUserName] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const navigateTo = useNavigate();
+
+  // OnClick lets us get user input
+  const loginUser = (e) => {
+    // prevent submit
+    e.preventDefault();
+    // require Axios to create and API that connects to the server
+    Axios.post("http://localhost:3002/login", {
+      // create variable to send to the server through the route
+      LoginUserName: loginUserName,
+      LoginPassword: loginPassword,
+    }).then((response) => {
+      console.log();
+      // catch an error if the credentials are wrong
+      if (response.data.message) {
+        navigateTo("/"); // navigate to the same Login page
+      } else {
+        navigateTo("/dashboard"); // If the credentials match, navigate to the dashboard
+      }
+    });
+  };
+
   return (
     <div className="loginPage flex">
       <div className="container flex">
@@ -40,13 +65,20 @@ const Login = () => {
           </div>
 
           <form action="" className="form grid">
-            <span className="showMessage">Login status will go here</span>
+            {/* <span className="message">Login status will go here</span> */}
 
             <div className="inputDiv">
               <label htmlFor="username">Username</label>
               <div className="input flex">
                 <FaUserShield className="icon" />
-                <input type="text" id="username" placeholder="Enter Username" />
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="Enter Username"
+                  onChange={(event) => {
+                    setLoginUserName(event.target.value);
+                  }}
+                />
               </div>
             </div>
 
@@ -58,11 +90,14 @@ const Login = () => {
                   type="password"
                   id="password"
                   placeholder="Enter Password"
+                  onChange={(event) => {
+                    setLoginPassword(event.target.value);
+                  }}
                 />
               </div>
             </div>
 
-            <button type="submit" className="btn flex">
+            <button type="submit" className="btn flex" onClick={loginUser}>
               <span>Login</span>
               <AiOutlineSwapRight className="icon" />
             </button>
