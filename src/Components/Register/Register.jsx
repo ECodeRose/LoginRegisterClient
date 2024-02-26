@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Register.css";
 import "../../App.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Axios from "axios";
 
 // Import assets
@@ -19,9 +19,11 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const navigateTo = useNavigate();
 
   // OnClick lets us get user input
-  const createUser = () => {
+  const createUser = (e) => {
+    e.preventDefault();
     // require Axios to create and API that connects to the server
     Axios.post("http://localhost:3002/register", {
       // create variable to send to the server through the route
@@ -29,7 +31,13 @@ const Register = () => {
       UserName: userName,
       Password: password,
     }).then(() => {
-      console.log("User has been created");
+      // On register redirect user to login page
+      navigateTo("/");
+
+      // Clear fields
+      setEmail("");
+      setUserName("");
+      setPassword("");
     });
   };
 
