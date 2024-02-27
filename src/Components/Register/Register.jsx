@@ -29,9 +29,9 @@ const Register = () => {
     // require Axios to create and API that connects to the server
     Axios.post("http://localhost:3002/register", {
       // create variable to send to the server through the route
-      Email: email,
-      UserName: userName,
-      Password: password,
+      email: email,
+      username: userName,
+      password: password,
     })
       .then(() => {
         // On register redirect user to login page

@@ -18,6 +18,7 @@ const Login = () => {
   const [loginUserName, setLoginUserName] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const navigateTo = useNavigate();
+  const [error, setError] = useState("");
 
   // Show message to user
   const [loginStatus, setLoginStatus] = useState("");
@@ -30,18 +31,30 @@ const Login = () => {
     // require Axios to create and API that connects to the server
     Axios.post("http://localhost:3002/login", {
       // create variable to send to the server through the route
-      LoginUserName: loginUserName,
-      LoginPassword: loginPassword,
-    }).then((response) => {
-      console.log();
-      // catch an error if the credentials are wrong
-      if (response.data.message || loginUserName == "" || loginPassword == "") {
-        navigateTo("/"); // navigate to the same Login page
-        setLoginStatus(`Credentials Don't Exist!`);
-      } else {
+      username: loginUserName,
+      password: loginPassword,
+    })
+      .then((response) => {
+        console.log(response);
+        const expiresIn = new Date(Date.now() + 24 * 3600 * 1000); // 1 day from now
+        const token = response.data.token;
+        const cookieValue = `token=${token}; expires=${expiresIn.toUTCString()}; path=/; HttpOnly; SameSite=Strict`;
+
+        console.log(cookieValue); // Check if the cookie string looks correct
+
+        document.cookie = cookieValue;
+
         navigateTo("/dashboard"); // If the credentials match, navigate to the dashboard
-      }
-    });
+      })
+      .catch((error) => {
+        // Handle error response from server
+        if (error.response && error.response.data.error) {
+          setError(error.response.data.error); // Set the error message state
+        } else {
+          console.error("Error:", error);
+          setError("An error occurred. Please try again later.");
+        }
+      });
   };
 
   useEffect(() => {
@@ -86,7 +99,11 @@ const Login = () => {
 
           <form className="form grid" onSubmit={onSubmit}>
             <span className={statusHolder}>{loginStatus}</span>
-
+            {error && (
+              <div className="error-box">
+                <p className="error-message">{error}</p>
+              </div>
+            )}{" "}
             <div className="inputDiv">
               <label htmlFor="username">Username</label>
               <div className="input flex">
@@ -101,7 +118,6 @@ const Login = () => {
                 />
               </div>
             </div>
-
             <div className="inputDiv">
               <label htmlFor="password">Password</label>
               <div className="input flex">
@@ -116,12 +132,10 @@ const Login = () => {
                 />
               </div>
             </div>
-
             <button type="submit" className="btn flex" onClick={loginUser}>
               <span>Login</span>
               <AiOutlineSwapRight className="icon" />
             </button>
-
             <span className="forgotPassword">
               Forgot your password? <a href="">Click Here</a>
             </span>
