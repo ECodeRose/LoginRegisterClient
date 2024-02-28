@@ -38,12 +38,12 @@ const Login = () => {
         console.log(response);
         const expiresIn = new Date(Date.now() + 24 * 3600 * 1000); // 1 day from now
         const token = response.data.token;
-        const cookieValue = `token=${token}; expires=${expiresIn.toUTCString()}; path=/; HttpOnly; SameSite=Strict`;
+        // console.log(cookieValue); // Check if the cookie string looks correct
 
-        console.log(cookieValue); // Check if the cookie string looks correct
-
-        document.cookie = cookieValue;
-
+        // const mycookie = (document.cookie = cookieValue);
+        const mycookie =
+          (document.cookie = `token=${token}; expires=${expiresIn.toUTCString()}; path=/;`);
+        console.log(mycookie);
         navigateTo("/dashboard"); // If the credentials match, navigate to the dashboard
       })
       .catch((error) => {
